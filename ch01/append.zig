@@ -10,8 +10,8 @@ pub fn main(init: std.process.Init) !void {
 
     const filePath = args[1];
 
-    // Open file for reas+write (fails if file does not exist)
-    const file = try std.Io.Dir.cwd().openFile(init.io, filePath, .{ .mode = .read_write });
+    // Open or create the file without truncating existing contents.
+    const file = try std.Io.Dir.cwd().createFile(init.io, filePath, .{ .read = true, .truncate = false });
     defer file.close(init.io);
 
     // Get the current file size and write at the end (append)
