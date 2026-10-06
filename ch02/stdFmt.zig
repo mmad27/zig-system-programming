@@ -39,6 +39,16 @@ pub fn main(init: std.process.Init) !void {
     );
     defer allocator.free(msg_struct);
     try stdout.writeStreamingAll(io, msg_struct);
+
+    // formatting directly into a fixed-size stack buffer:
+    var buffer: [64]u8 = undefined;
+    const slice = try std.fmt.bufPrint(
+        &buffer, 
+        "Stack buffer: {s}-{d}", 
+        .{ "Data", 42 }
+    );
+    try stdout.writeStreamingAll(io, slice);
+    try stdout.writeStreamingAll(io, "\n");
 }
 
 const User = struct {
