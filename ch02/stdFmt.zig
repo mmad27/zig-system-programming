@@ -17,6 +17,15 @@ pub fn main(init: std.process.Init) !void {
     );
     defer allocator.free(msg_nums);
     try stdout.writeStreamingAll(io, msg_nums);
+
+    const pi = 3.14159;
+    const msg_float = try std.fmt.allocPrint(
+        allocator, 
+        "Pi (2 decimals): {d:.2} | Padded: {d: >10.2}\n", 
+        .{ pi, pi }
+    );
+    defer allocator.free(msg_float);
+    try stdout.writeStreamingAll(io, msg_float);
 }
 
 const user = struct {
