@@ -62,6 +62,6 @@ pub fn main(init: std.process.Init) !void {
 
     if (!found) {
         std.log.err("Command '{s}' not found in PATH", .{command});
-        return error.FileNotFound;
+        std.process.exit(1);
     }
 }
