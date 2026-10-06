@@ -56,7 +56,6 @@ pub fn main(init: std.process.Init) !void {
             try stdout.writeStreamingAll(init.io, fullPath);
             try stdout.writeStreamingAll(init.io, "\n");
             found = true;
-            break;
         }
     }
 
