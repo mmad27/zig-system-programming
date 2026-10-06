@@ -24,11 +24,9 @@ pub fn main(init: std.process.Init) !void {
     const args = try init.minimal.args.toSlice(init.arena.allocator());
 
     if (args.len < 2) {
-        std.debug.print("Usage: {s} <command>\n", .{args[0]});
+        std.debug.print("Usage: {s} <command> [command ...]\n", .{args[0]});
         return;
     }
-
-    const command = args[1];
 
     const path_env = init.environ_map.get("PATH") orelse {
         std.debug.print("Error: PATH environment variable not set\n", .{});
@@ -37,30 +35,38 @@ pub fn main(init: std.process.Init) !void {
 
     const stdout = std.Io.File.stdout();
 
-    var dirs = std.mem.splitScalar(u8, path_env, ':');
-    var found = false;
+    var all_found = true;
 
-    while (dirs.next()) |dir| {
-        var pathBuf = std.ArrayList(u8).empty;
-        defer pathBuf.deinit(init.gpa);
+    for (args[1..]) |command| {
+        var dirs = std.mem.splitScalar(u8, path_env, ':');
+        var found = false;
 
-        try pathBuf.appendSlice(init.gpa, dir);
-        try pathBuf.append(init.gpa, '/');
-        try pathBuf.appendSlice(init.gpa, command);
-        const fullPath = pathBuf.items;
+        while (dirs.next()) |dir| {
+            var pathBuf = std.ArrayList(u8).empty;
+            defer pathBuf.deinit(init.gpa);
 
-        if (canAccess(init.io, fullPath) and
-            isFile(init.io, fullPath) and
-            isExecutable(init.io, fullPath))
-        {
-            try stdout.writeStreamingAll(init.io, fullPath);
-            try stdout.writeStreamingAll(init.io, "\n");
-            found = true;
+            try pathBuf.appendSlice(init.gpa, dir);
+            try pathBuf.append(init.gpa, '/');
+            try pathBuf.appendSlice(init.gpa, command);
+            const fullPath = pathBuf.items;
+
+            if (canAccess(init.io, fullPath) and
+                isFile(init.io, fullPath) and
+                isExecutable(init.io, fullPath))
+            {
+                try stdout.writeStreamingAll(init.io, fullPath);
+                try stdout.writeStreamingAll(init.io, "\n");
+                found = true;
+            }
+        }
+
+        if (!found) {
+            std.log.err("Command '{s}' not found in PATH", .{command});
+            all_found = false;
         }
     }
 
-    if (!found) {
-        std.log.err("Command '{s}' not found in PATH", .{command});
+    if (!all_found) {
         std.process.exit(1);
     }
 }
