@@ -9,6 +9,7 @@ pub fn main(init: std.process.Init) !void {
     const stdout = std.Io.File.stdout();
     std.debug.print("Debug: program started.\n", .{});
 
+    // Integer ------------------
     const number = 255;
     const msg_nums = try std.fmt.allocPrint(
         allocator, 
@@ -18,6 +19,7 @@ pub fn main(init: std.process.Init) !void {
     defer allocator.free(msg_nums);
     try stdout.writeStreamingAll(io, msg_nums);
 
+    // Floats ------------------
     const pi = 3.14159;
     const msg_float = try std.fmt.allocPrint(
         allocator, 
@@ -26,9 +28,20 @@ pub fn main(init: std.process.Init) !void {
     );
     defer allocator.free(msg_float);
     try stdout.writeStreamingAll(io, msg_float);
+
+    // Struct ------------------
+    const user = User{ .name = "Alice", .id = 101 };
+    const numbers = [_]u8{ 1, 2, 3 };
+    const msg_struct = try std.fmt.allocPrint(
+        allocator, 
+        "User: {any}, Array: {any}\n", 
+        .{ user, numbers }
+    );
+    defer allocator.free(msg_struct);
+    try stdout.writeStreamingAll(io, msg_struct);
 }
 
-const user = struct {
+const User = struct {
     name: []const u8,
     id: u32,
 };
