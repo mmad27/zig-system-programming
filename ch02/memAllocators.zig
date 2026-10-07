@@ -36,4 +36,12 @@ pub fn main(init: std.process.Init) !void {
     const n2 = try createNumbers(arena_allocator);
 
     try stdout.print("Arena Numbers: {any}, {any}\n", .{ n1, n2 });
+
+    // FixedBufferAllocator -------------------------------
+    var stack_buffer: [1024]u8 = undefined;
+    var fba = std.heap.FixedBufferAllocator.init(&stack_buffer);
+    
+    const fba_allocator = fba.allocator();
+    const n3 = try createNumbers(fba_allocator);
+    try stdout.print("Stack Numbers: {any}\n", .{ n3 });
 }
