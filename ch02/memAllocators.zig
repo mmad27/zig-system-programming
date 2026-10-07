@@ -26,4 +26,14 @@ pub fn main(init: std.process.Init) !void {
 
     try stdout.print("GPA Numbers: {any}\n", .{numbers});
     gpa_allocator.free(numbers);
+
+    // ArenaAllocator -------------------------------
+    var arena = std.heap.ArenaAllocator.init(gpa_allocator);
+    defer arena.deinit();
+
+    const arena_allocator = arena.allocator();
+    const n1 = try createNumbers(arena_allocator);
+    const n2 = try createNumbers(arena_allocator);
+
+    try stdout.print("Arena Numbers: {any}, {any}\n", .{ n1, n2 });
 }
