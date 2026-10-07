@@ -16,4 +16,14 @@ pub fn main(init: std.process.Init) !void {
     const stdout = &stdout_impl.interface;
 
     defer stdout.flush() catch {};
+
+    // DebugAllocator -------------------------------
+    var gpa: std.heap.DebugAllocator(.{}) = .init;
+    defer _ = gpa.deinit();
+
+    const gpa_allocator = gpa.allocator();
+    const numbers = try createNumbers(gpa_allocator);
+
+    try stdout.print("GPA Numbers: {any}\n", .{numbers});
+    gpa_allocator.free(numbers);
 }
