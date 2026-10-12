@@ -1,0 +1,16 @@
+.{
+    .name = .zuuid_cli,
+    .version = "0.0.0",
+    .fingerprint = 0xbef425581726760b,
+    .minimum_zig_version = "0.16.0",
+
+    .dependencies = .{
+        .zuuidcli = .{
+            .url = "git+https://github.com/mmad27/zuuid#e73f3100d88369384f765186c2e3c0c833c4ecfd",
+            .hash = "zuuid-0.0.0-Lmt06r8iAABHjVvm1y7NgIwhr7YOUjaNDrRK_OMYyk8K",
+            .branch = "main",
+        },
+    },
+
+    .paths = .{"."},
+}
