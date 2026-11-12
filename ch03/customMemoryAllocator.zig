@@ -75,4 +75,19 @@ pub const TrackingAllocator = struct {
             .{ FREED, self.allocBytes }
         );
     }
+
+    pub fn bytesAllocated(self: *TrackingAllocator) usize {
+        return self.allocBytes;
+    }
+
+    pub fn printBits(self: TrackingAllocator) void {
+        std.debug.print(
+            "Memory: {} bits\n", 
+            .{ self.allocBytes * bitsInByte }
+        );
+    }
+
+    pub fn printBytes(self: TrackingAllocator) void {
+        std.debug.print("Memory: {} bytes", .{ self.allocBytes });
+    }
 };
