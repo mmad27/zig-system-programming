@@ -91,3 +91,7 @@ pub const TrackingAllocator = struct {
         std.debug.print("Memory: {} bytes", .{ self.allocBytes });
     }
 };
+
+pub fn main(_: std.process.Init.Minimal) !void {
+    
+}
