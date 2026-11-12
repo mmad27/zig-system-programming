@@ -45,4 +45,34 @@ pub const TrackingAllocator = struct {
             );
         }
     }
+
+    pub fn create(
+        self: *TrackingAllocator,
+        comptime T: type,
+    ) !T {
+        const initialValue: usize = self.allocBytes;
+        const memory: *T = try self.allocator.create(T);
+        self.allocBytes += @sizeOf(T);
+        const AFTER = self.allocBytes - initialValue;
+        std.debug.print(
+            "Allocated {}. Current: {}\n", 
+            .{ AFTER, self.allocBytes }
+        );
+        return memory;
+    }
+
+    pub fn destroy(
+        self: *TrackingAllocator,
+        comptime T: type,
+        memory: *T,
+    ) void {
+        const initialValue: usize = self.allocBytes;
+        self.allocBytes -= @sizeOf(T);
+        self.allocator.destroy(memory);
+        const FREED: usize = initialValue - self.allocBytes;
+        std.debug.print(
+            "{} freed. Now: {}\n", 
+            .{ FREED, self.allocBytes }
+        );
+    }
 };
