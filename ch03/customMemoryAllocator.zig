@@ -49,7 +49,7 @@ pub const TrackingAllocator = struct {
     pub fn create(
         self: *TrackingAllocator,
         comptime T: type,
-    ) !T {
+    ) !*T {
         const initialValue: usize = self.allocBytes;
         const memory: *T = try self.allocator.create(T);
         self.allocBytes += @sizeOf(T);
@@ -88,10 +88,30 @@ pub const TrackingAllocator = struct {
     }
 
     pub fn printBytes(self: TrackingAllocator) void {
-        std.debug.print("Memory: {} bytes", .{ self.allocBytes });
+        std.debug.print("Memory: {} bytes\n", .{ self.allocBytes });
     }
 };
 
 pub fn main(_: std.process.Init.Minimal) !void {
-    
+    const allocator = std.heap.page_allocator;
+    var trackingAllocator = TrackingAllocator.init(allocator);
+    trackingAllocator.printBytes();
+
+    const n = 250;
+    const slice = try trackingAllocator.alloc(i16, n);
+    for (slice, 0..) |*item, index| {
+        item.* = @as(i16, @intCast(index));
+    }
+
+    _ = try trackingAllocator.alloc(i32, n);
+    trackingAllocator.free(i16, slice);
+    trackingAllocator.printBytes();
+
+    const anInt = try trackingAllocator.create(i64);
+    anInt.* = 42;
+    _ = try trackingAllocator.create(i64);
+
+    trackingAllocator.destroy(i64, anInt);
+    trackingAllocator.printBytes();
+    trackingAllocator.printBits();
 }
